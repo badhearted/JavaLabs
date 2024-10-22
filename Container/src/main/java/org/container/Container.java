@@ -25,4 +25,31 @@ public class Container<T> {
         }
         System.out.println();
     }
+
+    public void add(T element) {
+        if (size == array.length) {
+            resizeArray();
+        }
+        array[size] = element;
+        size++;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T get(int index) {
+        if (index >= size || index < 0) {
+            throw new IndexOutOfBoundsException("Index out of bounds: " + index);
+        }
+        return (T) array[index];
+    }
+
+    public void remove(int index) {
+        if (index >= size || index < 0) {
+            throw new IndexOutOfBoundsException("Index out of bounds: " + index);
+        }
+        for (int i = index; i < size - 1; i++) {
+            array[i] = array[i + 1];
+        }
+        array[size - 1] = null;
+        size--;
+    }
 }
