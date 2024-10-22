@@ -52,4 +52,5 @@ public class Container<T> {
         array[size - 1] = null;
         size--;
     }
+
 }
