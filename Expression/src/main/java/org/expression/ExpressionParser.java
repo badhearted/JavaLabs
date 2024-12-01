@@ -2,21 +2,46 @@ package org.expression;
 
 import java.util.*;
 
+/**
+ * Класс для парсинга математических выражений и построения абстрактного синтаксического дерева (AST).
+ * Поддерживает операции сложения, вычитания, умножения, деления, возведения в степень, а также работу с переменными.
+ */
 public class ExpressionParser {
+    /** Строковое представление математического выражения. */
     private final String expression;
+
+    /** Текущая позиция в выражении. */
     private int pos = -1;
+
+    /** Текущий символ в выражении. */
     private int ch;
+
+    /** Множество переменных, найденных в выражении. */
     private Set<String> variables = new HashSet<>();
 
+    /**
+     * Конструктор для создания парсера для заданного математического выражения.
+     *
+     * @param expression строковое представление математического выражения
+     */
     public ExpressionParser(String expression) {
         this.expression = expression;
         nextChar();
     }
 
+    /**
+     * Перемещает указатель на следующий символ в выражении.
+     */
     private void nextChar() {
         ch = (++pos < expression.length()) ? expression.charAt(pos) : -1;
     }
 
+    /**
+     * Пропускает символы, пока не встретится указанный символ.
+     *
+     * @param charToEat символ, который нужно пропустить
+     * @return true, если символ был найден и пропущен, иначе false
+     */
     private boolean eat(int charToEat) {
         while (ch == ' ') nextChar();
         if (ch == charToEat) {
@@ -26,16 +51,32 @@ public class ExpressionParser {
         return false;
     }
 
+    /**
+     * Получить множество переменных, найденных в выражении.
+     *
+     * @return множество переменных
+     */
     public Set<String> getVariables() {
         return variables;
     }
 
+    /**
+     * Главный метод для парсинга выражения. Возвращает корень абстрактного синтаксического дерева (AST).
+     *
+     * @return корень AST, представляющий разобранное выражение
+     * @throws RuntimeException если встречается неожиданный символ
+     */
     public ExpressionNode parse() {
         ExpressionNode x = parseExpression();
         if (pos < expression.length()) throw new RuntimeException("Неожиданный символ: " + (char) ch);
         return x;
     }
 
+    /**
+     * Парсит выражения с операциями сложения и вычитания.
+     *
+     * @return узел AST, представляющий выражение
+     */
     private ExpressionNode parseExpression() {
         ExpressionNode x = parseTerm();
         while (true) {
@@ -45,6 +86,11 @@ public class ExpressionParser {
         }
     }
 
+    /**
+     * Парсит выражения с операциями умножения и деления.
+     *
+     * @return узел AST, представляющий выражение
+     */
     private ExpressionNode parseTerm() {
         ExpressionNode x = parseFactor();
         while (true) {
@@ -54,6 +100,11 @@ public class ExpressionParser {
         }
     }
 
+    /**
+     * Парсит атомарные элементы: числа, переменные, а также обработку унарных операторов и скобок.
+     *
+     * @return узел AST, представляющий фактор (число, переменную, выражение в скобках)
+     */
     private ExpressionNode parseFactor() {
         if (eat('+')) return parseFactor(); // унарный плюс
         if (eat('-')) return new ExpressionNode('-', new ExpressionNode(0), parseFactor()); // унарный минус
